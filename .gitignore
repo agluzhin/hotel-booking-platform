@@ -1,0 +1,28 @@
+# Maven / Java build output
+**/target/
+**/out/
+*.class
+*.jar
+*.war
+
+# IntelliJ IDEA
+.idea/
+*.iml
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+
+# H2 database files
+*.mv.db
+*.trace.db
+*.lock.db
+
+# macOS
+.DS_Store
