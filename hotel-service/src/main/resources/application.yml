@@ -1,0 +1,31 @@
+server:
+  port: 8082
+spring:
+  application:
+    name: hotel-service
+  datasource:
+    url: 'jdbc:h2:mem:hoteldb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL'
+    username: sa
+    password: ''
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+security:
+  jwt:
+    secret: '${JWT_SECRET:local-dev-secret-key-change-me-32-bytes-minimum!}'
+  internal-key: '${INTERNAL_SERVICE_KEY:local-internal-key}'
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+logging:
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{traceId:-}] [%thread] %logger{36} - %msg%n'
