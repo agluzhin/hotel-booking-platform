@@ -2,6 +2,7 @@ package com.hotelbooking.hotel.api;
 
 import java.time.Instant;
 import java.util.NoSuchElementException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,6 +31,12 @@ public class HotelExceptionHandler {
   @ExceptionHandler(IllegalStateException.class)
   ResponseEntity<Error> conflict(IllegalStateException exception) {
     return response(HttpStatus.CONFLICT, "CONFLICT", exception.getMessage());
+  }
+
+  /** Преобразует нарушение уникальности номера комнаты в HTTP 409. */
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  ResponseEntity<Error> duplicate(DataIntegrityViolationException exception) {
+    return response(HttpStatus.CONFLICT, "CONFLICT", "Room number already exists in this hotel");
   }
 
   /** Преобразует отсутствие сущности в HTTP 404. */

@@ -21,4 +21,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
   /** Проверяет, содержит ли гостиница хотя бы один номер. */
   boolean existsByHotelId(Long hotelId);
+
+  /** Проверяет уникальность номера комнаты в гостинице при изменении. */
+  boolean existsByHotelIdAndNumberAndIdNot(Long hotelId, String number, Long id);
 }

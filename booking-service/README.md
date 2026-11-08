@@ -109,7 +109,7 @@ curl -i -X POST http://localhost:8080/api/booking \
 mvn -pl booking-service test
 ```
 
-`BookingServiceTest` проверяет: подтверждение, отказ Hotel Service, тайм-аут удалённого вызова с компенсацией и повторную доставку `requestId`. Полный набор всех модулей запускается командой `mvn clean verify`.
+`BookingServiceTest` проверяет бизнес-логику подтверждения, отказ Hotel Service, тайм-аут удалённого вызова с компенсацией и повторную доставку `requestId`. `BookingApiIntegrationTest` дополнительно проверяет через MockMvc JWT-доступ, HTTP-сценарий саги, идемпотентность и личную историю. Полный набор всех модулей запускается командой `mvn clean verify`.
 
 ## Сага и настройки
 

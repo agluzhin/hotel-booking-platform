@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +37,9 @@ public class HotelController {
 
   /** DTO добавления номера в гостиницу. */
   public record RoomRequest(@NotNull Long hotelId, @NotBlank String number) {}
+
+  /** DTO полного обновления номера без изменения его гостиницы. */
+  public record RoomUpdateRequest(@NotBlank String number) {}
 
   /** Создаёт контроллер Hotel Service. */
   public HotelController(
@@ -92,6 +96,20 @@ public class HotelController {
         room.getTimesBooked());
   }
 
+  /** Обновляет номер комнаты; доступно ADMIN. */
+  @PutMapping("/rooms/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
+  public HotelService.RoomView updateRoom(
+      @PathVariable Long id, @Valid @RequestBody RoomUpdateRequest request) {
+    Room room = service.updateRoomNumber(id, request.number());
+    return new HotelService.RoomView(
+        room.getId(),
+        room.getHotel().getId(),
+        room.getNumber(),
+        room.isAvailable(),
+        room.getTimesBooked());
+  }
+
   /** Удаляет номер без сохранённой истории слотов; доступно ADMIN. */
   @DeleteMapping("/rooms/{id}")
   @PreAuthorize("hasRole('ADMIN')")
@@ -111,6 +129,13 @@ public class HotelController {
   public List<HotelService.RoomView> recommend(
       @RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
     return service.freeRooms(startDate, endDate, true);
+  }
+
+  /** Возвращает загрузку всех номеров; доступно ADMIN. */
+  @GetMapping("/rooms/statistics")
+  @PreAuthorize("hasRole('ADMIN')")
+  public List<HotelService.RoomStatistics> roomStatistics() {
+    return service.roomStatistics();
   }
 
   /** Внутренняя команда временной блокировки номера на даты. */

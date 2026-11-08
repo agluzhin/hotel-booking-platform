@@ -65,6 +65,11 @@ public class Room {
     return number;
   }
 
+  /** Меняет номер комнаты внутри гостиницы. */
+  public void setNumber(String number) {
+    this.number = number;
+  }
+
   /** Возвращает признак эксплуатационной доступности номера. */
   public boolean isAvailable() {
     return available;

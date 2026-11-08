@@ -34,6 +34,15 @@ public class HotelService {
   public record RoomView(
       Long id, Long hotelId, String number, boolean available, long timesBooked) {}
 
+  /** Сводная загрузка одного номера для административного отчёта. */
+  public record RoomStatistics(
+      Long roomId,
+      Long hotelId,
+      String hotelName,
+      String number,
+      boolean available,
+      long timesBooked) {}
+
   /** Данные для внутренней команды подтверждения или освобождения периода. */
   public record AvailabilityRequest(LocalDate startDate, LocalDate endDate, String requestId) {}
 
@@ -83,6 +92,17 @@ public class HotelService {
     return room;
   }
 
+  /** Обновляет номер комнаты, не меняя гостиницу и историю бронирований. */
+  @Transactional
+  public Room updateRoomNumber(Long id, String number) {
+    Room room = rooms.findById(id).orElseThrow(() -> new NoSuchElementException("Room not found"));
+    if (rooms.existsByHotelIdAndNumberAndIdNot(room.getHotel().getId(), number, id)) {
+      throw new IllegalStateException("Room number already exists in this hotel");
+    }
+    room.setNumber(number);
+    return room;
+  }
+
   /** Удаляет номер, если у него нет связанной истории слотов. */
   @Transactional
   public void deleteRoom(Long id) {
@@ -104,6 +124,26 @@ public class HotelService {
         .filter(room -> slots.findOverlaps(room.getId(), startDate, endDate).isEmpty())
         .sorted(ordering)
         .map(this::toView)
+        .toList();
+  }
+
+  /** Возвращает загрузку всех номеров, включая временно недоступные. */
+  @Transactional(readOnly = true)
+  public List<RoomStatistics> roomStatistics() {
+    return rooms.findAll().stream()
+        .sorted(
+            Comparator.comparingLong(Room::getTimesBooked)
+                .reversed()
+                .thenComparing(Room::getId))
+        .map(
+            room ->
+                new RoomStatistics(
+                    room.getId(),
+                    room.getHotel().getId(),
+                    room.getHotel().getName(),
+                    room.getNumber(),
+                    room.isAvailable(),
+                    room.getTimesBooked()))
         .toList();
   }
 
